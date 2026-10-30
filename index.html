@@ -42,6 +42,8 @@ textarea{min-height:110px;resize:vertical}
 .jh p{font-size:clamp(16px,5vw,22px);color:#dbe7ff}
 .jg{background:linear-gradient(135deg,#0f7a67 0%,#10a06f 100%);color:#fff;border-radius:22px;padding:22px 18px;text-align:center;margin-bottom:12px;box-shadow:0 8px 22px rgba(15,122,103,.22)}
 .jg p{font-size:clamp(17px,5.4vw,24px);color:#fff}
+.qi{display:block;max-width:100%;max-height:340px;object-fit:contain;margin-top:10px;border-radius:12px;background:#fff;border:1px solid var(--bd);cursor:zoom-in}
+.pal{width:40px;height:40px;border-radius:10px;border:1.5px solid var(--bd);background:var(--card);color:var(--tx);font-weight:700;margin:3px;cursor:pointer}.pal.a{background:var(--ac2);color:var(--ac);border-color:var(--ac)}.pal.c{outline:2px solid var(--ac)}.opt.sel{border-color:var(--ac);background:var(--ac2)}.rv .opt.ok{background:rgba(13,159,110,.25);border-color:#0d9f6e}.rv .opt.no{background:rgba(225,29,72,.25);border-color:#e11d48}.exp{margin-top:10px;padding:10px;border-radius:12px;background:var(--bg);font-size:14px;line-height:1.45}
 </style></head><body>
 <header><button class="ib" id="bk" style="visibility:hidden;font-size:26px" onclick="hb()" aria-label="Back">‹</button><button class="ib" onclick="dr(1)" aria-label="Menu">☰</button><h1>MDCAT<small>JOURNEY 🩺</small></h1><span class="net" id="net"></span><button class="ib" onclick="theme()" aria-label="Theme">◐</button></header>
 <div id="drawer" onclick="dr(0)"><nav onclick="event.stopPropagation()"><h2 style="margin:0 0 14px;font-size:28px">MDCAT</h2><div id="nav"></div></nav></div>
@@ -125,6 +127,7 @@ var NAV=[["home","Dashboard","🏠","#e6168a"],["practice","Practice","🧠","#e
 var D,V="home",Q=null,T=null,IM={items:[],src:"",busy:""};
 function migrate(){D.log=D.log||[];D.bm=D.bm||[];D.papers=D.papers||[];D.mocks=D.mocks||[];D.books=D.books||[];D.mast=D.mast||[];D.todo=D.todo||[];D.study=D.study||{};D.set=Object.assign({neg:0.25,sec:60,goal:30,min:60,diff:"All",only:1},D.set||{});
 if(!D.sec)D.sec=[["SPSC","🏫","#e6168a"],["SKN","🏥","#0d9f6e"],["KIPS","📚","#f59e0b"],["QCA","🎯","#2563eb"],["STEP","🧠","#7c3aed"]].map(function(a,i){return{id:"d"+i,name:a[0],em:a[1],c:a[2],p:null}});
+if(!D.yr){D.yr=1;[["xi","First Year (XI)","🥇","#2563eb"],["xii","Second Year (XII)","🥈","#7c3aed"]].forEach(function(y){if(!secById(y[0]))D.sec.push({id:y[0],name:y[1],em:y[2],c:y[3],p:null});[["bio","Biology","🧬","#0d9f6e"],["chem","Chemistry","⚗️","#f59e0b"],["phy","Physics","⚡","#2563eb"]].forEach(function(j){var id=y[0]+"-"+j[0];if(!secById(id))D.sec.push({id:id,name:j[1],em:j[2],c:j[3],p:y[0]})})})}
 var old=D.mcq.some(function(m){return!m.sec})||D.log.some(function(x){return!x.sec});
 if(old){if(!secById("gen"))D.sec.push({id:"gen",name:"General",em:"📘",c:"#06b6d4",p:null});D.mcq.forEach(function(m){if(!m.sec)m.sec="gen"});D.log.forEach(function(x){if(!x.sec)x.sec="gen"})}}
 function content(){return{sec:D.sec,mcq:D.mcq,notes:D.notes,papers:D.papers.map(function(p){var q=Object.assign({},p);q.has=false;return q})}}
@@ -158,11 +161,11 @@ function uid(){return "u"+Date.now().toString(36)+Math.random().toString(36).sli
 function dr(o){if(AUTHON&&!USER)return;$("drawer").classList.toggle("on",!!o)}
 function theme(){var r=document.documentElement,d=r.getAttribute("data-theme")==="dark"||(!r.getAttribute("data-theme")&&matchMedia("(prefers-color-scheme:dark)").matches);r.setAttribute("data-theme",d?"light":"dark")}
 var H=[],NOH=["secform","mcqadd","paperadd","note","mockrun"];
-function go(v,x,nb){x=x||null;if(AUTHON&&!USER&&v!=="auth"){v="auth";x=null}if(!ADMIN&&["imp","secform","mcqadd","paperadd"].indexOf(v)>-1){v="home";x=null}if(!nb&&(v!==V||x!==Q)&&NOH.indexOf(V)<0){H.push({v:V,q:Q});if(H.length>60)H.shift();try{history.pushState({n:1},"")}catch(e){}}V=v;Q=x;dr(0);$("nav").innerHTML=(AUTHON&&!USER)?"":(USER?'<a onclick="go(\'profile\')"><i>\uD83D\uDC64</i>'+esc(USER.name)+'</a>':"")+NAV.filter(function(n){return(ADMIN||n[0]!=="imp")&&((window.claude&&window.claude.use)||["ai","books"].indexOf(n[0])<0)}).map(function(n){return '<a class="'+(n[0]===V?"cur":"")+'" onclick="go(\''+n[0]+'\')"><i style="background:'+n[3]+'22">'+n[2]+'</i>'+n[1]+'</a>'}).join("")+(USER?'<a onclick="logout()"><i>\uD83D\uDEAA</i>Log out</a>':"");render();$("bk").style.visibility=H.length?"visible":"hidden";scrollTo(0,0)}
+function go(v,x,nb){x=x||null;if(AUTHON&&!USER&&v!=="auth"){v="auth";x=null}if(!ADMIN&&["imp","secform","mcqadd","paperadd"].indexOf(v)>-1){v="home";x=null}if(!nb&&(v!==V||x!==Q)&&NOH.indexOf(V)<0){H.push({v:V,q:Q});if(H.length>60)H.shift();try{history.pushState({n:1},"")}catch(e){}}V=v;Q=x;dr(0);$("nav").innerHTML=(AUTHON&&!USER)?"":(USER?'<a onclick="go(\'profile\')"><i>\uD83D\uDC64</i>'+esc(USER.name)+'</a>':"")+NAV.filter(function(n){return(ADMIN||n[0]!=="imp")&&((window.claude&&window.claude.use)||["ai"].indexOf(n[0])<0)}).map(function(n){return '<a class="'+(n[0]===V?"cur":"")+'" onclick="go(\''+n[0]+'\')"><i style="background:'+n[3]+'22">'+n[2]+'</i>'+n[1]+'</a>'}).join("")+(USER?'<a onclick="logout()"><i>\uD83D\uDEAA</i>Log out</a>':"");render();$("bk").style.visibility=H.length?"visible":"hidden";scrollTo(0,0)}
 function back(){if($("drawer").classList.contains("on")){dr(0);return}if(!H.length)return;var p=H.pop();go(p.v,p.q,1)}
 function hb(){try{if(H.length&&history.state&&history.state.n){history.back();return}}catch(e){}back()}
 addEventListener("popstate",function(){if($("drawer").classList.contains("on")){dr(0);try{history.pushState({n:1},"")}catch(e){}return}back()});
-function render(){var f={comm:comm,csec:csec,cnew:cnew,creports:creports,auth:auth,profile:profile,books:books,solve:solve,mock:mock,mockrun:mockrun,mockres:mockres,bmpage:bmpage,wrong:wrong,planner:planner,revision:revision,search:search,settings:settings,ai:ai,home:home,practice:practice,quiz:quiz,notes:notes,note:noteEd,secform:secform,mcqadd:mcqadd,stats:stats,backup:backup,papers:papers,paperadd:paperAdd,imp:imp}[V];$("app").innerHTML=f()}
+function render(){var f={comm:comm,csec:csec,cnew:cnew,creports:creports,auth:auth,profile:profile,books:books,solve:solve,mock:mock,mockrun:mockrun,mockres:mockres,bmpage:bmpage,wrong:wrong,planner:planner,revision:revision,search:search,settings:settings,ai:ai,home:home,practice:practice,quiz:quiz,notes:notes,note:noteEd,secform:secform,mcqadd:mcqadd,stats:stats,backup:backup,papers:papers,paperadd:paperAdd,imp:imp}[V];$("app").innerHTML=f();hydrate()}
 function secById(id){return D.sec.filter(function(x){return x.id===id})[0]}
 function kids(id){return D.sec.filter(function(x){return(x.p||null)===(id||null)})}
 function ids(id){var r=[id];kids(id).forEach(function(k){r=r.concat(ids(k.id))});return r}
@@ -196,11 +199,13 @@ function practice(){var id=Q,s=id?secById(id):null;if(!s)id=null;var h='';
 if(s)h+='<div class="row" style="margin-bottom:8px"><button class="btn g s" onclick="'+gp(s.p)+'">‹ Back</button><span class="mu sp">'+esc(path(id))+'</span></div>';
 h+='<h2 class="t">'+(s?esc(s.name):"Practice")+'</h2>'+(ADMIN?'<div class="row" style="margin-bottom:12px"><button class="btn s" onclick="secNew('+(id?"'"+id+"'":"null")+')">+ Section</button>'+(s?'':'<button class="btn g s" onclick="impTo(null)">Upload PDF</button>')+(s?'<button class="btn s" onclick="mcqNew(\''+id+'\')">+ MCQ</button><button class="btn g s" onclick="impTo(\''+id+'\')">Upload PDF</button><button class="btn g s" onclick="shareNew(\''+id+'\')">Share</button><button class="btn g s" onclick="secEdit(\''+id+'\')">Edit</button><button class="btn g s" onclick="secDel(\''+id+'\')">Delete</button>':"")+'</div>':"");
 if(s){var n=D.mcq.filter(function(m){return ids(id).indexOf(m.sec)>-1&&m.a>=0}).length;if(n)h+='<button class="btn" style="margin-bottom:12px;width:100%" onclick="start(\'s:'+id+'\')">Practice all ('+n+' MCQs)</button>'}
-if(s&&ADMIN){var aa=ids(id),un=D.mcq.filter(function(m){return aa.indexOf(m.sec)>-1&&m.a<0}).length;if(un)h+='<div class="box" style="--c:#7c3aed"><b>'+un+' MCQs have no answer yet</b><p style="margin:6px 0 10px">Let the AI find the answers in your books.</p><button class="btn" onclick="solveSec(\''+id+'\')">Solve with AI</button></div>'}
+if(s&&ADMIN){var aa=ids(id),un=D.mcq.filter(function(m){return aa.indexOf(m.sec)>-1&&m.a<0}).length;if(un)h+='<div class="box" style="--c:#7c3aed"><b>'+un+' MCQs have no answer yet</b><p style="margin:6px 0 10px">Find the answers in your books. Works offline, and the book page is saved as the explanation.</p><div class="row"><button class="btn" onclick="bookKey(\''+id+'\')">Find answers from my books</button>'+(window.claude&&claude.use?'<button class="btn g" onclick="solveSec(\''+id+'\')">Solve with AI</button>':"")+'</div></div>'}
+if(s){var aa2=ids(id),all2=D.mcq.filter(function(m){return aa2.indexOf(m.sec)>-1}),wa=all2.filter(function(m){return m.a>=0}).length,ch2=chainSec(id),bk2=D.books.filter(function(b){return b.sec&&ch2.indexOf(b.sec)>-1}),cf=all2.filter(function(m){return m.vf&&m.vf.ok===0&&!m.vf.keep}).length,unv=all2.filter(function(m){return m.a>=0&&!m.vf}).length;
+h+='<div class="box" style="--c:#7c3aed"><b>📚 Book and test for this section</b><p style="margin:6px 0 10px">'+(bk2.length?bk2.map(function(b){return esc(b.t)+' ('+b.n+' pages)'}).join(", "):"No book uploaded here yet. Upload this chapter's book (PDF or photos) so the app can read it and make or check the answer key.")+'</p><div class="row"><button class="btn g s" onclick="go(\'books\',\''+id+'\')">Upload book / photos</button>'+(wa?'<button class="btn s" onclick="testStart(\''+id+'\')">Take test ('+wa+' MCQs)</button>':"")+(D.books.length&&unv?'<button class="btn g s" onclick="verifyKey(\''+id+'\')">Verify my answers with book</button>':"")+(cf?'<button class="btn g s" onclick="verifyShow(\''+id+'\')">⚠ '+cf+' differ from book</button>':"")+'</div></div>'}
 var ks=kids(id);
 ks.forEach(function(k){var sub=kids(k.id).length;h+=box(k.c,k.em,esc(k.name),sub?sub+" sections inside":"Open to add MCQs",cnt(k.id)+" MCQS",gp(k.id),1)});
 if(s){var own=D.mcq.filter(function(m){return m.sec===id});
-if(own.length){h+='<div class="mu" style="margin:6px 0">'+own.length+' MCQs in this section (latest 30)</div>';own.slice().reverse().slice(0,30).forEach(function(m){h+='<div class="box" style="--c:'+s.c+'"><p style="color:inherit;margin:0 0 8px">'+(m.a<0?'<span class="pill" style="--c:#e11d48">No answer</span> ':"")+esc(m.q)+'</p>'+(ADMIN?'<button class="btn g s" onclick="delM(\''+m.id+'\')">Delete</button>':"")+'</div>'})}
+if(own.length){h+='<div class="mu" style="margin:6px 0"><b>'+own.length+' MCQs</b> in this section, numbered in order</div>';own.forEach(function(m,k){h+='<div class="box" style="--c:'+s.c+'"><p style="color:inherit;margin:0 0 8px"><b style="font-size:18px">'+(k+1)+'.</b> '+(m.a<0?'<span class="pill" style="--c:#e11d48">No answer</span> ':"")+qnum(m)+esc(m.q)+'</p>'+qimg(m)+(ADMIN?'<button class="btn g s" onclick="delM(\''+m.id+'\')">Delete</button>':"")+'</div>'})}
 else if(!ks.length)h+=box(s.c,"📭","Empty section","Use + Section to make folders or + MCQ to add questions.","",0,0)}
 else{if(!ks.length)h+=box("#e6168a","🗂️","No sections yet","Tap + Section to make your first one.","",0,0);
 h+='<div class="g2" style="margin-top:12px">'+box("#e6168a","🎯","Mixed test","20 random MCQs","ALL","start('*')",0)+box("#f59e0b","🔖","Bookmarked","Questions you saved",D.bm.length+" SAVED","start('bm')",0)+'</div><div style="height:12px"></div>'+box("#e11d48","🔁","Wrong answers","Retry what you missed","REVISE","start('wrong')",1)}
@@ -210,7 +215,7 @@ p=p.filter(function(m){return m.a>=0});if(!p.length){alert("No MCQs with answers
 p.sort(function(){return Math.random()-.5});T={list:p.slice(0,k==="*"?20:200),i:0,ok:0,pick:null,picks:{},back:V==="practice"?Q:null};go("quiz")}
 function quiz(){if(!T)return practice();if(T.i>=T.list.length)return '<div class="hero"><h2>Done</h2><p>Score: '+T.ok+' / '+T.list.length+'</p><button class="btn w" onclick="'+gp(T.back)+'">Back to practice</button></div>';
 var m=T.list[T.i];if(!T.t0)T.t0=Date.now();var bm=D.bm.indexOf(m.id)>-1,ts=secById(topOf(m.sec)),c=ts?ts.c:"#e6168a";
-var h='<div class="row" style="margin-bottom:10px"><span class="chip">'+esc(path(m.sec)||"MCQ")+'</span><span class="mu sp">'+(T.i+1)+' of '+T.list.length+'</span><button class="btn g s" onclick="bmk(\''+m.id+'\')">'+(bm?"Bookmarked":"Bookmark")+'</button></div><div class="box" style="--c:'+c+'"><b>'+esc(m.q)+'</b></div>';
+var h='<div class="row" style="margin-bottom:10px"><span class="chip">'+esc(path(m.sec)||"MCQ")+'</span><span class="mu sp">'+(T.i+1)+' of '+T.list.length+'</span><button class="btn g s" onclick="bmk(\''+m.id+'\')">'+(bm?"Bookmarked":"Bookmark")+'</button></div><div class="box" style="--c:'+c+'"><b>'+qnum(m)+esc(m.q)+'</b>'+qimg(m)+'</div>';
 m.o.forEach(function(o,i){var cl="";if(T.pick!==null){if(i===m.a)cl=" ok";else if(i===T.pick)cl=" no"}h+='<button class="opt'+cl+'" '+(T.pick!==null?"disabled":"")+' onclick="ans('+i+')">'+"ABCDE"[i]+'. '+esc(o)+'</button>'});
 if(T.pick!==null&&m.e)h+='<div class="card mu">'+esc(m.e)+'</div>';return h+'<div class="row"><button class="btn g" '+(T.i?"":"disabled")+' onclick="qgo(-1)">Previous</button><span class="sp"></span><button class="btn" onclick="qgo(1)">'+(T.i+1<T.list.length?(T.pick!==null?"Next":"Skip"):"Finish")+'</button></div>'}
 function qgo(d){T.i+=d;T.pick=T.picks[T.i]!==undefined?T.picks[T.i]:null;T.t0=0;render();scrollTo(0,0)}
@@ -233,9 +238,10 @@ function mcqadd(){var s=secById(Q);if(!s)return practice();var ok=window._ok;win
 return '<h2 class="t">Add MCQ</h2><div class="card mu">To: <b>'+esc(path(Q))+'</b> '+(ok?'<span class="chip">Saved</span>':"")+'</div><div class="box" style="--c:'+s.c+'"><textarea id="mq" style="min-height:70px" placeholder="Question"></textarea><input id="m0" placeholder="Option A"><input id="m1" placeholder="Option B"><input id="m2" placeholder="Option C"><input id="m3" placeholder="Option D"><select id="ma"><option value="0">Correct: A</option><option value="1">Correct: B</option><option value="2">Correct: C</option><option value="3">Correct: D</option></select><input id="me" placeholder="Explanation (optional)"><select id="md"><option>Medium</option><option>Easy</option><option>Hard</option></select><div class="row"><button class="btn" onclick="addM(1)">Save and add another</button><button class="btn g" onclick="addM(0)">Save and close</button></div></div>'}
 function addM(more){var q=$("mq").value.trim(),o=[0,1,2,3].map(function(i){return $("m"+i).value.trim()});if(!q||o.some(function(x){return!x})){alert("Fill the question and all four options.");return}
 D.mcq.push({id:uid(),sec:Q,q:q,o:o,a:+$("ma").value,e:$("me").value.trim(),d:$("md").value});save();if(more){window._ok=1;render()}else go("practice",Q)}
-function delM(id){D.mcq=D.mcq.filter(function(m){return m.id!==id});save();render()}
+var PLN={};
+function delM(id){D.mcq=D.mcq.filter(function(m){return m.id!==id});try{sdel("i",id)}catch(e){}save();render()}
 /* ---------- past papers ---------- */
-function idb(){return new Promise(function(res,rej){var r=indexedDB.open("mdcat",2);r.onupgradeneeded=function(){var d=r.result;if(!d.objectStoreNames.contains("f"))d.createObjectStore("f");if(!d.objectStoreNames.contains("b"))d.createObjectStore("b")};r.onsuccess=function(){res(r.result)};r.onerror=function(){rej()}})}
+function idb(){return new Promise(function(res,rej){var r=indexedDB.open("mdcat",3);r.onupgradeneeded=function(){var d=r.result;if(!d.objectStoreNames.contains("f"))d.createObjectStore("f");if(!d.objectStoreNames.contains("b"))d.createObjectStore("b");if(!d.objectStoreNames.contains("i"))d.createObjectStore("i")};r.onsuccess=function(){res(r.result)};r.onerror=function(){rej()}})}
 function sput(st,id,v){return idb().then(function(db){return new Promise(function(res,rej){var t=db.transaction(st,"readwrite");t.objectStore(st).put(v,id);t.oncomplete=res;t.onerror=rej})})}
 function sget(st,id){return idb().then(function(db){return new Promise(function(res,rej){var r=db.transaction(st).objectStore(st).get(id);r.onsuccess=function(){res(r.result)};r.onerror=rej})})}
 function sdel(st,id){return idb().then(function(db){db.transaction(st,"readwrite").objectStore(st).delete(id)})}
@@ -254,26 +260,103 @@ var done=function(){D.papers.push(p);save();go("papers")};if(f)fput(p.id,f).then
 function openP(id){fget(id).then(function(b){if(!b){alert("PDF not found.");return}var u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.target="_blank";a.rel="noopener";document.body.appendChild(a);a.click();a.remove()})}
 function delP(id){if(!confirm("Delete this paper and its MCQs?"))return;D.papers=D.papers.filter(function(p){return p.id!==id});D.mcq=D.mcq.filter(function(m){return m.src!==id});save();fdel(id);render()}
 /* ---------- MCQ extraction ---------- */
-function parseMCQ(txt){var L=txt.split(/\n/).map(function(s){return s.replace(/\s+/g," ").trim()}).filter(Boolean),qs=[],c=null,keys={},lo=-1,OR=/(?:^|\s)\(?([A-Ea-e])[\.\)]\s+/;
-function push(){if(c&&c.o.length>=2)qs.push(c);c=null}
-L.forEach(function(l){var k=l.match(/^(\d{1,3})\s*[\.\-\)\:]\s*\(?([A-Da-d])\)?\s*$/);if(k){keys[+k[1]]=k[2].toUpperCase().charCodeAt(0)-65;return}
-var an=l.match(/^(?:ans(?:wer)?|correct(?: answer)?)\s*[:\-\.]?\s*\(?([A-Da-d])\b/i);if(an&&c){c.a=an[1].toUpperCase().charCodeAt(0)-65;return}
-if(c&&/^\(?[A-Ea-e][\.\)]\s/.test(l)){var p=l.split(OR);for(var i=1;i<p.length;i+=2)c.o.push((p[i+1]||"").trim());lo=c.o.length-1;return}
-var q=l.match(/^(?:Q(?:uestion)?\.?\s*)?(\d{1,3})\s*[\.\)\:]\s*(.+)/i);if(q){push();c={n:+q[1],q:q[2],o:[],a:-1};lo=-1;return}
-if(c){if(c.o.length&&lo>-1)c.o[lo]+=" "+l;else c.q+=" "+l}});push();
-qs.forEach(function(q){if(q.a<0&&keys[q.n]!==undefined)q.a=keys[q.n];q.o=q.o.slice(0,5)});return qs}
-function pdfText(buf){return pdfLib().then(function(L){return L.getDocument({data:new Uint8Array(buf)}).promise}).then(function(doc){var out="",n=doc.numPages;
-function pg(i){if(i>n)return out;IM.busy="Reading page "+i+" of "+n+"...";render();return doc.getPage(i).then(function(p){return p.getTextContent()}).then(function(tc){var y=null;tc.items.forEach(function(it){var ty=it.transform[5];if(y!==null&&Math.abs(ty-y)>3)out+="\n";else if(y!==null)out+=" ";out+=it.str;y=ty});out+="\n";return pg(i+1)})}
+function splitO(t,k0,min){var pos=[],from=0;for(var k=k0;k<5;k++){var r=new RegExp("(?:^|\\s)\\(?"+"ABCDE"[k]+"[\\.\\)]\\s*","i"),m=r.exec(t.slice(from));if(!m)break;var st=from+m.index,en=st+m[0].length;pos.push([st,en]);from=en}
+if(pos.length<min)return null;var o=[];for(var i=0;i<pos.length;i++)o.push(t.slice(pos[i][1],i+1<pos.length?pos[i+1][0]:t.length).trim());return{pre:t.slice(0,pos[0][0]).trim(),o:o}}
+function parseMCQ(txt){var L=(Array.isArray(txt)?txt:txt.split(/\n/).map(function(s){return{t:s}})).map(function(o){return{t:o.t.replace(/\s+/g," ").trim(),p:o.p||0,y:o.y||0,top:o.top||0}}).filter(function(o){return o.t}),qs=[],c=null,keys={},lo=-1,lastN=0,eMode=false,bad=[],
+QRE=/^(?:Q(?:uestion)?\.?\s*)?(\d{1,4})\s*(?:[\.\:]\s+|\)\s*|[\.\:](?=[A-Za-z(]))(.+)/i,
+KROW=/^(?:\d{1,4}\s*[\.\-\):]?\s*\(?[A-Da-d]\)?(?:\s+|$))+$/,KPAIR=/(\d{1,4})\s*[\.\-\):]?\s*\(?([A-Da-d])\)?(?=\s|$)/g;
+function push(){if(c&&c.o.length>=2)qs.push(c);else if(c)bad.push(c.n);c=null}
+function touch(ln){if(c){c.ep=ln.p;c.ey=ln.y}}
+L.forEach(function(ln){var l=ln.t;
+if(KROW.test(l)){var m;KPAIR.lastIndex=0;while((m=KPAIR.exec(l)))keys[+m[1]]=m[2].toUpperCase().charCodeAt(0)-65;return}
+if(/^(answer\s*keys?|answers|keys?|mcqs?)\s*:?$/i.test(l))return;
+var an=l.match(/^(?:ans(?:wer)?|correct(?: answer| option)?|right answer)\s*[:\-\.]?\s*\(?([A-Da-d])\b/i);if(an&&c){c.a=an[1].toUpperCase().charCodeAt(0)-65;touch(ln);return}
+var ex=l.match(/^(?:explanation|exp|solution|reason)\s*[:\-]\s*(.*)/i);if(ex&&c){c.e=ex[1];eMode=true;touch(ln);return}
+var om=l.match(/^\(?([A-Ea-e])[\.\)]/);
+if(c&&om&&!eMode){var k=om[1].toUpperCase().charCodeAt(0)-65;if(k===c.o.length){var r=splitO(l,k,1);if(r){r.o.forEach(function(x){c.o.push(x)});lo=c.o.length-1;touch(ln);return}}}
+var q=l.match(QRE);
+if(q){var num=+q[1],isNew=!c;
+if(c){if(c.o.length<2)isNew=(num===lastN+1);else isNew=(num>lastN||num===1)}
+if(isNew){if(c)c.nx={p:ln.p,top:ln.top};push();c={n:num,q:q[2],o:[],a:-1,e:"",p:ln.p,top:ln.top,ep:ln.p,ey:ln.y};lastN=num;lo=-1;eMode=false;var r2=splitO(q[2],0,2);if(r2){c.q=r2.pre;c.o=r2.o;lo=c.o.length-1}return}}
+if(c){touch(ln);if(eMode)c.e+=" "+l;else if(c.o.length&&lo>-1)c.o[lo]+=" "+l;else c.q+=" "+l}});
+push();
+qs.forEach(function(q){if(q.a<0&&keys[q.n]!==undefined)q.a=keys[q.n];q.o=q.o.slice(0,5);q.q=q.q.trim();q.e=(q.e||"").trim()});
+var have={},mn=1e9,mx=0,gaps=[];qs.forEach(function(q){have[q.n]=1;if(q.n<mn)mn=q.n;if(q.n>mx)mx=q.n});for(var i=mn;i<=mx;i++)if(!have[i])gaps.push(i);qs.gaps=gaps;return qs}
+function imBusy(t){IM.busy=t;var e=$("imb");if(e)e.textContent=t;else render()}
+function pdfText(buf){var info={H:{},W:{},top:{},rects:{}};
+return pdfLib().then(function(L){return L.getDocument({data:new Uint8Array(buf)}).promise}).then(function(doc){info.doc=doc;var pages=[],n=doc.numPages;
+function fin(){var cnt={};function nk(l){return l.replace(/\d+/g,"#").toLowerCase()}
+pages.forEach(function(a){a.forEach(function(o){o.t=o.t.replace(/\s+/g," ").trim()});var u={};a.forEach(function(o){if(o.t)u[nk(o.t)]=1});for(var k in u)cnt[k]=(cnt[k]||0)+1});
+var th=n<4?n:Math.ceil(n*0.6),flat=[];
+pages.forEach(function(a,pi){var kept=a.filter(function(o){var l=o.t;if(!l)return false;if(/^(page\s*)?\d{1,4}(\s*(of|\/)\s*\d{1,4})?$/i.test(l))return false;if(n>=2&&l.length<90&&cnt[nk(l)]>=th&&!/^\(?[A-Ea-e][\.\)]\s/.test(l)&&!/^(?:Q(?:uestion)?\.?\s*)?\d{1,4}\s*[\.\:\)]\s/i.test(l)&&!/^(ans|answer|correct)/i.test(l))return false;return true});
+if(kept.length)info.top[pi+1]=kept[0].top;kept.forEach(function(o){flat.push(o)})});
+return{lines:flat,info:info}}
+function pg(i){if(i>n)return fin();imBusy("Reading page "+i+" of "+n+"...");return doc.getPage(i).then(function(p){var vp=p.getViewport({scale:1});info.W[i]=vp.width;info.H[i]=vp.height;return p.getTextContent().then(function(tc){var lines=[],cur=null,y=null,rc=[];
+tc.items.forEach(function(it){if(!it.str)return;var ty=it.transform[5],h=it.height||Math.abs(it.transform[3])||10;
+if(y!==null&&Math.abs(ty-y)>3)cur=null;else if(cur)cur.t+=" ";
+if(!cur){cur={t:"",p:i,y:ty,top:ty+h};lines.push(cur)}
+cur.t+=it.str;if(ty+h>cur.top)cur.top=ty+h;y=ty;
+if(it.str.trim())rc.push([it.transform[4],ty-h*0.3,it.width||0,h*1.4])});
+info.rects[i]=rc;pages.push(lines);try{p.cleanup()}catch(e){}return pg(i+1)})})}
 return pg(1)})}
-function runExtract(buf,src){IM.src=src||"";IM.busy="Reading PDF...";render();pdfText(buf).then(function(t){IM.items=parseMCQ(t);IM.busy="";if(!IM.items.length)alert("No MCQs found. The PDF may be scanned images. Try pasting the text instead.");render()},function(e){IM.busy="";render();alert(e==="nolib"?"The PDF reader could not start in this browser. Use the latest Chrome.":"Could not read this PDF.")})}
+var SCL=1.8;
+function segsFor(q,info){var out=[];if(!q.p)return out;var p0=q.p,p1=q.nx?q.nx.p:(q.ep||q.p);if(p1<p0)p1=p0;
+for(var p=p0;p<=p1;p++){var H=info.H[p];if(!H)continue;var t=(p===p0)?q.top+3:(info.top[p]||H)+3,b;
+if(p===p1){b=(q.nx&&q.nx.p===p)?q.nx.top+3:Math.max(0,q.ey-4)}else b=H*0.04;
+t=Math.min(t,H);b=Math.max(b,0);if(t-b>10)out.push({p:p,t:t,b:b})}
+return out}
+function inkOf(cv,rects){var w=cv.width,h=cv.height,t=document.createElement("canvas");t.width=w;t.height=h;var x=t.getContext("2d");x.drawImage(cv,0,0);x.fillStyle="#fff";
+rects.forEach(function(r){x.fillRect(r[0]-3,r[1]-3,r[2]-r[0]+6,r[3]-r[1]+6)});
+var d=x.getImageData(0,0,w,h).data,n=0,x0=w,y0=h,x1=-1,y1=-1,mL=Math.floor(w*0.05),mR=Math.ceil(w*0.95);
+for(var yy=0;yy<h;yy++)for(var xx=mL;xx<mR;xx++){var k=(yy*w+xx)*4;if(d[k]<215||d[k+1]<215||d[k+2]<215){n++;if(xx<x0)x0=xx;if(xx>x1)x1=xx;if(yy<y0)y0=yy;if(yy>y1)y1=yy}}
+t.width=t.height=0;return{n:n,x0:x0,y0:y0,x1:x1,y1:y1,hit:n>=250&&(x1-x0)>=45&&(y1-y0)>=30}}
+function trimCv(cv){var w=cv.width,h=cv.height,d=cv.getContext("2d").getImageData(0,0,w,h).data,x0=w,y0=h,x1=-1,y1=-1;
+for(var y=0;y<h;y++)for(var x=0;x<w;x++){var k=(y*w+x)*4;if(d[k]<245||d[k+1]<245||d[k+2]<245){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}}
+if(x1<0)return null;var P=10,ox=Math.max(0,x0-P),oy=Math.max(0,y0-P),ow=Math.min(w,x1+P+1)-ox,oh=Math.min(h,y1+P+1)-oy,o=document.createElement("canvas");o.width=ow;o.height=oh;var c=o.getContext("2d");c.fillStyle="#fff";c.fillRect(0,0,ow,oh);c.drawImage(cv,ox,oy,ow,oh,0,0,ow,oh);return o}
+function stackCv(a){var w=0,h=0;a.forEach(function(c){if(c.width>w)w=c.width;h+=c.height+6});var o=document.createElement("canvas");o.width=w;o.height=h;var x=o.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,w,h);var y=0;a.forEach(function(c){x.drawImage(c,0,y);y+=c.height+6;c.width=0});return o}
+function grabImages(doc,info,items,mode,force,prog){var by={};
+items.forEach(function(q){q.sg=segsFor(q,info);q.sg.forEach(function(g){g.cv=null;(by[g.p]=by[g.p]||[]).push(g)})});
+var pgs=Object.keys(by).map(Number).sort(function(a,b){return a-b}),n=pgs.length;
+function one(k){if(k>=n)return Promise.resolve();if(prog)prog(k+1,n);var pn=pgs[k];
+return doc.getPage(pn).then(function(pg){var vp=pg.getViewport({scale:SCL}),cv=document.createElement("canvas");cv.width=Math.ceil(vp.width);cv.height=Math.ceil(vp.height);var cx=cv.getContext("2d");cx.fillStyle="#fff";cx.fillRect(0,0,cv.width,cv.height);
+return pg.render({canvasContext:cx,viewport:vp}).promise.then(function(){
+var rr=(info.rects[pn]||[]).map(function(r){var a=vp.convertToViewportRectangle([r[0],r[1],r[0]+r[2],r[1]+r[3]]);return[Math.min(a[0],a[2]),Math.min(a[1],a[3]),Math.max(a[0],a[2]),Math.max(a[1],a[3])]});
+by[pn].forEach(function(g){var a=vp.convertToViewportRectangle([0,g.b,info.W[pn],g.t]),y0=Math.max(0,Math.floor(Math.min(a[1],a[3]))),y1=Math.min(cv.height,Math.ceil(Math.max(a[1],a[3]))),h=y1-y0;if(h<8)return;
+var band=document.createElement("canvas");band.width=cv.width;band.height=h;band.getContext("2d").drawImage(cv,0,y0,cv.width,h,0,0,cv.width,h);
+var rb=rr.filter(function(r){return r[3]>y0&&r[1]<y1}).map(function(r){return[r[0],r[1]-y0,r[2],r[3]-y0]});
+var ik=inkOf(band,rb);g.hit=ik.hit;
+if(mode==="f"){g.cv=band}
+else if(ik.hit){var P=20,x0=Math.max(0,ik.x0-P),yy0=Math.max(0,ik.y0-P),x1=Math.min(band.width,ik.x1+P),yy1=Math.min(band.height,ik.y1+P),c2=document.createElement("canvas");c2.width=x1-x0;c2.height=yy1-yy0;c2.getContext("2d").drawImage(band,x0,yy0,c2.width,c2.height,0,0,c2.width,c2.height);g.cv=c2;band.width=0}
+else if(force){g.cv=band}else band.width=0});
+cv.width=0;try{pg.cleanup()}catch(e){}})})
+.then(function(){return one(k+1)})}
+return one(0).then(function(){items.forEach(function(q){var a=(q.sg||[]).filter(function(g){return g.cv});if(!a.length)return;
+var big=stackCv(a.map(function(g){return g.cv})),t=trimCv(big);big.width=0;if(!t)return;
+q.img=t.toDataURL("image/jpeg",0.82);t.width=0;q.sg=null})})}
+function runExtract(buf,src){IM.src=src||"";IM.busy="Reading PDF...";IM.items=[];IM.doc=null;IM.info=null;render();
+pdfText(buf).then(function(r){IM.items=parseMCQ(r.lines);IM.info=r.info;IM.doc=r.info.doc;
+if(!IM.items.length){IM.busy="";render();alert("No MCQs found. The PDF may be scanned images. Try pasting the text instead.");return}
+if(IM.nodg){IM.busy="";render();return}
+return grabImages(IM.doc,IM.info,IM.items,"d",false,function(i,n){imBusy("Looking for diagrams: page "+i+" of "+n+"...")}).then(function(){IM.busy="";render()},function(){IM.busy="";render()})},
+function(e){IM.busy="";render();alert(e==="nolib"?"The PDF reader could not start in this browser. Use the latest Chrome.":"Could not read this PDF.")})}
+function impic(q,i){if(q.img)return'<img class="qi" src="'+q.img+'" alt="diagram" onclick="zoomImg(this)"><div class="row" style="margin-top:6px"><button class="btn g s" onclick="IM.items['+i+'].img=null;render()">Remove picture</button><button class="btn g s" onclick="imPic('+i+',\'f\')">Whole question</button></div>';
+return(IM.doc&&q.p)?'<div class="row" style="margin-top:6px"><button class="btn g s" onclick="imPic('+i+',\'f\')">Add picture of question</button></div>':""}
+function imPic(i,m){var q=IM.items[i];if(!q||!IM.doc)return;IM.busy="Making picture...";render();
+grabImages(IM.doc,IM.info,[q],m,true,null).then(function(){IM.busy="";render()},function(){IM.busy="";render();alert("Could not make the picture.")})}
+var IMC={};
+function hydrate(){var l=document.querySelectorAll("img[data-im]");for(var i=0;i<l.length;i++)(function(el){var id=el.getAttribute("data-im");if(IMC[id]){el.src=IMC[id];return}sget("i",id).then(function(v){if(v){var n=0;for(var k in IMC)n++;if(n>60)IMC={};IMC[id]=v;el.src=v}else el.style.display="none"},function(){el.style.display="none"})})(l[i])}
+function qimg(m){return m.im?'<img class="qi" data-im="'+m.id+'" alt="diagram" onclick="zoomImg(this)" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==">':""}
+function zoomImg(el){var d=document.createElement("div");d.style.cssText="position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;padding:10px";d.onclick=function(){d.remove()};var i=document.createElement("img");i.src=el.src;i.style.cssText="max-width:100%;max-height:100%;background:#fff;border-radius:8px";d.appendChild(i);document.body.appendChild(d)}
+function qnum(m){return(m.n?'<span class="pill" style="--c:#6e6a80">Q'+m.n+'</span> ':"")+(m.ks?'<span class="pill" style="--c:#7c3aed">\uD83D\uDCD6 p.'+m.ks.p+(m.ks.c==="m"?" ?":"")+'</span> ':"")}
 function extractP(id){go("imp",id);IM.items=[];fget(id).then(function(b){if(!b)return alert("PDF not found.");b.arrayBuffer().then(function(buf){runExtract(buf,id)})})}
 function imp(){if(!D.sec.length)return '<h2 class="t">Import MCQs</h2>'+box("#f59e0b","🗂️","Create a section first","Go to Practice and tap + Section.","",0,0);var pp=Q?D.papers.filter(function(p){return p.id===Q})[0]:null;
-var h='<h2 class="t">Import MCQs</h2>'+howTo()+(pp?'<div class="card mu">From paper: <b>'+esc(pp.t)+'</b></div>':"")+'<div class="box" style="--c:#f59e0b"><div class="mu" style="margin-bottom:6px">Save into section</div><select id="is" onchange="IM.sec=this.value">'+D.sec.map(function(x){return '<option value="'+x.id+'"'+(x.id===IM.sec?" selected":"")+'>'+esc(path(x.id))+'</option>'}).join("")+'</select>'+(pp?"":'<div class="mu" style="margin-bottom:6px">Pick a PDF</div><input id="if" type="file" accept="application/pdf" onchange="pickPdf(this)"><textarea id="it" placeholder="Or paste text here: 1. Question... A) ... B) ... C) ... D) ... Answer: B"></textarea><button class="btn" onclick="IM.items=parseMCQ($(\'it\').value);if(!IM.items.length)alert(\'No MCQs found in that text.\');render()">Find MCQs in text</button>')+(IM.busy?'<div class="mu" style="margin-top:8px">'+IM.busy+'</div>':"")+'</div>';
-if(IM.items.length){var ok=IM.items.filter(function(q){return q.a>=0}).length;h+='<div class="card"><b>'+IM.items.length+' MCQs found</b><div class="mu">'+ok+' have an answer. Set the rest, or leave them for the AI to answer from your books.</div><div class="row" style="margin-top:8px"><button class="btn" onclick="doImp()">Import</button><button class="btn g" onclick="IM.items=[];render()">Clear</button></div></div>';
-IM.items.slice(0,60).forEach(function(q,i){h+='<div class="box" style="--c:'+(q.a>=0?"#0d9f6e":"#e11d48")+'"><p style="color:inherit;margin:0 0 6px"><b>'+esc(q.q)+'</b></p>'+q.o.map(function(o,j){return '<div class="mu">'+"ABCDE"[j]+'. '+esc(o)+'</div>'}).join("")+'<div class="row" style="margin-top:8px"><select style="margin:0;width:auto" onchange="IM.items['+i+'].a=+this.value;render()"><option value="-1">Set answer</option>'+q.o.map(function(o,j){return '<option value="'+j+'"'+(q.a===j?" selected":"")+'>Correct: '+"ABCDE"[j]+'</option>'}).join("")+'</select><button class="btn g s" onclick="IM.items.splice('+i+',1);render()">Remove</button></div></div>'});if(IM.items.length>60)h+='<div class="mu">Showing the first 60. Import adds all of them.</div>'}
+var h='<h2 class="t">Import MCQs</h2>'+howTo()+(pp?'<div class="card mu">From paper: <b>'+esc(pp.t)+'</b></div>':"")+'<div class="box" style="--c:#f59e0b"><div class="mu" style="margin-bottom:6px">Save into section</div><select id="is" onchange="IM.sec=this.value">'+D.sec.map(function(x){return '<option value="'+x.id+'"'+(x.id===IM.sec?" selected":"")+'>'+esc(path(x.id))+'</option>'}).join("")+'</select>'+(pp?"":'<label class="mu" style="display:flex;gap:8px;align-items:center;margin-bottom:10px"><input type="checkbox" style="width:auto;margin:0" onchange="IM.nodg=!this.checked"'+(IM.nodg?"":" checked")+'> Capture diagrams and pictures from the PDF (a bit slower)</label><div class="mu" style="margin-bottom:6px">Pick a PDF</div><input id="if" type="file" accept="application/pdf" onchange="pickPdf(this)"><textarea id="it" placeholder="Or paste text here: 1. Question... A) ... B) ... C) ... D) ... Answer: B"></textarea><button class="btn" onclick="IM.items=parseMCQ($(\'it\').value);if(!IM.items.length)alert(\'No MCQs found in that text.\');render()">Find MCQs in text</button>')+(IM.busy?'<div class="mu" id="imb" style="margin-top:8px">'+IM.busy+'</div>':"")+'</div>';
+if(IM.items.length){var ok=IM.items.filter(function(q){return q.a>=0}).length,np=IM.items.filter(function(q){return q.img}).length;h+='<div class="card"><b>'+IM.items.length+' MCQs found (all shown below, numbered)</b><div class="mu">'+ok+' have an answer'+(np?', '+np+' have a diagram picture':"")+'. Set the rest, or leave them for the AI to answer from your books.</div>'+(IM.items.gaps&&IM.items.gaps.length?'<div class="mu" style="color:#e11d48;margin-top:6px">Could not read '+IM.items.gaps.length+' question number(s): '+IM.items.gaps.slice(0,40).join(", ")+(IM.items.gaps.length>40?" ...":"")+'. Their options may be images or in an unusual format.</div>':"")+'<div class="row" style="margin-top:8px"><button class="btn" onclick="doImp()">Import</button><button class="btn g" onclick="IM.items=[];render()">Clear</button></div></div>';
+IM.items.forEach(function(q,i){h+='<div class="box" style="--c:'+(q.a>=0?"#0d9f6e":"#e11d48")+'"><p style="color:inherit;margin:0 0 6px"><b>Q'+(q.n||i+1)+'.</b> <b>'+esc(q.q)+'</b></p>'+q.o.map(function(o,j){return '<div class="mu">'+"ABCDE"[j]+'. '+esc(o)+'</div>'}).join("")+impic(q,i)+'<div class="row" style="margin-top:8px"><select style="margin:0;width:auto" onchange="IM.items['+i+'].a=+this.value;render()"><option value="-1">Set answer</option>'+q.o.map(function(o,j){return '<option value="'+j+'"'+(q.a===j?" selected":"")+'>Correct: '+"ABCDE"[j]+'</option>'}).join("")+'</select><button class="btn g s" onclick="IM.items.splice('+i+',1);render()">Remove</button></div></div>'});}
 return h}
 function pickPdf(el){var f=el.files[0];if(f)f.arrayBuffer().then(function(b){runExtract(b,"")})}
-function doImp(){var sc=$("is").value,n=0;IM.items.forEach(function(q){if(q.o.length>=2){D.mcq.push({id:uid(),sec:sc,q:q.q,o:q.o,a:q.a,e:"",src:IM.src||undefined});n++}});save();var skipped=IM.items.length-n;IM.items=[];alert(n+" MCQs imported."+(skipped?" "+skipped+" skipped (fewer than 2 options).":""));go(IM.src?"papers":"practice",IM.src?null:sc)}
+function doImp(){var sc=$("is").value,n=0,jobs=[],np=0;IM.items.forEach(function(q){if(q.o.length>=2){var m={id:uid(),sec:sc,q:q.q,o:q.o,a:q.a,e:q.e||"",n:q.n||(n+1),src:IM.src||undefined};if(q.img){m.im=1;np++;jobs.push(sput("i",m.id,q.img).catch(function(){m.im=0;np--}))}D.mcq.push(m);n++}});
+var skipped=IM.items.length-n,from=IM.src;Promise.all(jobs).then(function(){save();IM.items=[];IM.doc=null;IM.info=null;alert(n+" MCQs imported."+(np?" "+np+" with diagram pictures.":"")+(skipped?" "+skipped+" skipped (fewer than 2 options).":""));go(from?"papers":"practice",from?null:sc)})}
 function stats(){var a=stat(),t=D.log.filter(function(x){return x.dt}),avg=t.length?Math.round(t.reduce(function(q,x){return q+x.dt},0)/t.length):0,best=D.mocks.reduce(function(b,r){return r.pct>b?r.pct:b},0);
 var h='<h2 class="t">Analytics</h2><div class="hero"><h2>'+a.p+'%</h2><p>'+a.ok+' correct · '+(a.n-a.ok)+' wrong'+(avg?' · avg '+avg+' s per MCQ':"")+'</p></div><div class="g2"><div class="box" style="--c:#0d9f6e"><h3>'+best+'%</h3><p>Best mock score</p></div><div class="box" style="--c:#2563eb"><h3>'+D.mocks.length+'</h3><p>Mock tests</p></div></div><div style="height:12px"></div>';
 var r=D.sec.map(function(x){return{s:x,x:stat(x.id)}}).filter(function(o){return o.x.n>=3}).sort(function(p,q){return p.x.p-q.x.p});
@@ -299,28 +382,44 @@ return h}
 function mockStart(sc,n,mins){var a=sc.indexOf("s:")===0?ids(sc.slice(2)):[];var p=D.mcq.filter(function(m){if(sc==="*")return 1;if(sc.indexOf("p:")===0)return m.src===sc.slice(2);return a.indexOf(m.sec)>-1});
 p=p.filter(function(m){return m.a>=0});if(!p.length){alert("No MCQs with answers in that selection.");return}
 p.sort(function(){return Math.random()-.5});n=Math.min(n>0?n:180,180,p.length);p=p.slice(0,n);mins=mins>0?mins:Math.max(1,Math.round(n*D.set.sec/60));
-clearInterval(window._iv);M={list:p,ans:{},i:0,end:Date.now()+mins*60000,start:Date.now()};window._iv=setInterval(tick,1000);go("mockrun")}
-function tick(){if(!M||M.fin){clearInterval(window._iv);return}var r=Math.max(0,Math.round((M.end-Date.now())/1000)),e=$("tm");if(e)e.textContent=pad(r);if(r<=0){mockSubmit(1);alert("Time is up. Your test was submitted.")}}
-function mockrun(){if(!M||M.fin)return mock();var m=M.list[M.i],r=Math.max(0,Math.round((M.end-Date.now())/1000)),an=Object.keys(M.ans).length,ts=secById(topOf(m.sec));
-var h='<div class="row" style="margin-bottom:10px"><span class="pill" id="tm" style="--c:#e11d48">'+pad(r)+'</span><span class="mu sp">Q '+(M.i+1)+' of '+M.list.length+' · answered '+an+'</span></div><div class="box" style="--c:'+(ts?ts.c:"#e6168a")+'"><b>'+esc(m.q)+'</b></div>';
-m.o.forEach(function(o,j){h+='<button class="opt'+(M.ans[M.i]===j?" ok":"")+'" onclick="mpick('+j+')">'+"ABCDE"[j]+'. '+esc(o)+'</button>'});
-return h+'<div class="row" style="margin-top:6px"><button class="btn g" '+(M.i?"":"disabled")+' onclick="M.i--;render()">Previous</button><button class="btn g" '+(M.i<M.list.length-1?"":"disabled")+' onclick="M.i++;render()">Next</button><span class="sp"></span><button class="btn" onclick="mockSubmit(0)">Submit</button></div>'}
+clearInterval(window._iv);M={list:p,ans:{},i:0,end:Date.now()+mins*60000,start:Date.now(),neg:D.set.neg};window._iv=setInterval(tick,1000);go("mockrun")}
+function tick(){if(!M||M.fin){clearInterval(window._iv);return}if(!M.end)return;var r=Math.max(0,Math.round((M.end-Date.now())/1000)),e=$("tm");if(e)e.textContent=pad(r);if(r<=0){mockSubmit(1);alert("Time is up. Your test was submitted.")}}
+function mockrun(){if(!M||M.fin)return mock();var m=M.list[M.i],n=M.list.length,last=M.i===n-1,an=Object.keys(M.ans).length,ts=secById(topOf(m.sec));
+var tm=M.end?'<span class="pill" id="tm" style="--c:#e11d48">'+pad(Math.max(0,Math.round((M.end-Date.now())/1000)))+'</span>':"";
+var h='<div class="row" style="margin-bottom:10px">'+tm+'<span class="mu sp">Q '+(M.i+1)+' of '+n+' · answered '+an+'</span></div>';
+h+='<details style="margin-bottom:10px"><summary class="mu" style="cursor:pointer">Question list (tap to jump)</summary><div style="margin-top:6px">'+M.list.map(function(x,k){return'<button class="pal'+(M.ans[k]!==undefined?" a":"")+(k===M.i?" c":"")+'" onclick="M.i='+k+';render()">'+(k+1)+'</button>'}).join("")+'</div></details>';
+h+='<div class="box" style="--c:'+(ts?ts.c:"#e6168a")+'"><b>'+esc(m.q)+'</b>'+qimg(m)+'</div>';
+m.o.forEach(function(o,j){h+='<button class="opt'+(M.ans[M.i]===j?" sel":"")+'" onclick="mpick('+j+')">'+"ABCDE"[j]+'. '+esc(o)+'</button>'});
+h+='<div class="row" style="margin-top:6px"><button class="btn g" '+(M.i?"":"disabled")+' onclick="M.i--;render()">Previous</button>'+(last?"":'<button class="btn g" onclick="M.i++;render()">Next</button>')+'<span class="sp"></span>'+(last?"":'<button class="btn g" onclick="mockSubmit(0)">Submit</button>')+'</div>';
+if(last)h+='<div class="box" style="--c:#0d9f6e;margin-top:12px"><b>That was the last MCQ</b><p style="margin:6px 0 10px">'+an+' of '+n+' answered'+(an<n?' · '+(n-an)+' not answered yet':'')+'. Use the question list to go back, or submit to see every MCQ with its explanation.</p><button class="btn" style="width:100%" onclick="mockSubmit(0)">Submit test</button></div>';
+return h}
 function mpick(j){if(M.ans[M.i]===j)delete M.ans[M.i];else M.ans[M.i]=j;render()}
-function mockSubmit(auto){if(!auto&&!confirm("Submit the test now?"))return;clearInterval(window._iv);var c=0,w=0,id=[],an=[];
+function mockSubmit(auto){var un=M.list.length-Object.keys(M.ans).length;if(!auto&&!confirm(un?"You have "+un+" unanswered MCQ"+(un>1?"s":"")+". Submit the test anyway?":"Submit the test now?"))return;clearInterval(window._iv);var c=0,w=0,id=[],an=[],neg=M.neg!==undefined?M.neg:D.set.neg,back=M.back||null;
 M.list.forEach(function(m,i){var a=M.ans[i];id.push(m.id);an.push(a===undefined?-1:a);if(a===undefined)return;var ok=a===m.a;ok?c++:w++;D.log.push({id:m.id,sec:m.sec,ok:ok,t:Date.now()})});
-var n=M.list.length,sc=Math.round((c-w*D.set.neg)*100)/100,rec={t:Date.now(),n:n,c:c,w:w,sk:n-c-w,sc:sc,pct:Math.max(0,Math.round(sc/n*100)),secs:Math.round((Date.now()-M.start)/1000),ids:id,ans:an};
-D.mocks.push(rec);save();M={rec:rec,fin:1};go("mockres")}
-function mockReview(i){M={rec:D.mocks[i],fin:1};go("mockres")}
-function mockres(){var r=M&&M.rec;if(!r)return mock();
-var h='<div class="hero"><h2>'+r.sc+' / '+r.n+'</h2><p>'+r.pct+'% · '+r.c+' correct · '+r.w+' wrong · '+r.sk+' skipped · '+pad(r.secs)+' min</p><button class="btn w" onclick="go(\'mock\')">New test</button></div><h3>Review</h3>';
-r.ids.forEach(function(id,i){var m=mcqById(id);if(!m)return;var a=r.ans[i],st=a<0?"skip":a===m.a?"ok":"no";
-h+='<div class="box" style="--c:'+(st==="ok"?"#0d9f6e":st==="no"?"#e11d48":"#6e6a80")+'"><b>'+(i+1)+'. '+esc(m.q)+'</b><div class="mu" style="margin-top:6px">Your answer: '+(a<0?"skipped":"ABCDE"[a]+". "+esc(m.o[a]))+'</div><div class="mu">Correct: '+"ABCDE"[m.a]+'. '+esc(m.o[m.a])+'</div>'+(m.e?'<div class="mu">'+esc(m.e)+'</div>':"")+'</div>'});return h}
+var n=M.list.length,sc=Math.round((c-w*neg)*100)/100,rec={t:Date.now(),n:n,c:c,w:w,sk:n-c-w,sc:sc,pct:Math.max(0,Math.round(sc/n*100)),secs:Math.round((Date.now()-M.start)/1000),ids:id,ans:an,sec:back};
+D.mocks.push(rec);save();M={rec:rec,fin:1,back:back};go("mockres")}
+function mockReview(i){M={rec:D.mocks[i],fin:1,back:D.mocks[i].sec||null};go("mockres")}
+function testStart(id){var a=ids(id),all=D.mcq.filter(function(m){return a.indexOf(m.sec)>-1}),p=all.filter(function(m){return m.a>=0});
+if(!p.length){alert("No MCQs with answers here yet. Upload the MCQs, then use Find answers from my books.");return}
+if(all.length>p.length&&!confirm((all.length-p.length)+" MCQs have no answer and will be left out. Continue?"))return;
+clearInterval(window._iv);M={list:p.slice(0,300),ans:{},i:0,end:0,start:Date.now(),neg:0,back:id};go("mockrun")}
+function mockres(){var r=M&&M.rec;if(!r)return mock();var f=M.flt||"all",cc={ok:0,no:0,skip:0},rows=[];
+r.ids.forEach(function(id,i){var m=mcqById(id);if(!m)return;var a=r.ans[i],st=a<0?"skip":a===m.a?"ok":"no";cc[st]++;rows.push({m:m,i:i,a:a,st:st})});
+var h='<div class="hero"><h2>'+r.sc+' / '+r.n+'</h2><p>'+r.pct+'% · '+r.c+' correct · '+r.w+' wrong · '+r.sk+' skipped · '+pad(r.secs)+' min</p><div class="row">'+(M.back&&secById(M.back)?'<button class="btn w" onclick="'+gp(M.back)+'">Back to section</button>':"")+'<button class="btn w" onclick="go(\'mock\')">New test</button></div></div>';
+h+='<div class="row" style="margin-bottom:10px">'+[["all","All ("+rows.length+")"],["no","Wrong ("+cc.no+")"],["ok","Correct ("+cc.ok+")"],["skip","Skipped ("+cc.skip+")"]].map(function(t){return'<button class="btn '+(f===t[0]?"":"g")+' s" onclick="M.flt=\''+t[0]+'\';render()">'+t[1]+'</button>'}).join("")+'</div>';
+var need=[];
+rows.filter(function(o){return f==="all"||o.st===f}).forEach(function(o){var m=o.m,col=o.st==="ok"?"#0d9f6e":o.st==="no"?"#e11d48":"#6e6a80";
+h+='<div class="box rv" style="--c:'+col+'"><div class="row" style="margin-bottom:6px"><span class="pill" style="--c:'+col+'">'+(o.st==="ok"?"✓ Correct":o.st==="no"?"✗ Wrong":"Skipped")+'</span><span class="mu sp">Q'+(o.i+1)+'</span>'+qnum(m)+'</div><b>'+esc(m.q)+'</b>'+qimg(m);
+m.o.forEach(function(t,j){var cl=j===m.a?" ok":(j===o.a?" no":"");h+='<div class="opt'+cl+'" style="margin:8px 0 0;cursor:default">'+(j===m.a?"✓ ":(j===o.a?"✗ ":""))+"ABCDE"[j]+". "+esc(t)+(j===o.a?"  (your answer)":"")+(j===m.a&&o.st!=="ok"?"  (correct answer)":"")+'</div>'});
+if(m.vf&&m.vf.ok===0&&!m.vf.keep)h+='<div class="mu" style="color:#f59e0b;margin-top:8px">⚠ Your book says option '+"ABCDE"[m.vf.a]+' (p.'+m.vf.p+'). Check this answer.</div>';
+h+='<div class="exp"><b>Explanation:</b> <span data-ex="'+m.id+'">'+(m.e?esc(m.e):(D.books.length?"Looking in your books...":"No explanation saved for this MCQ."))+'</span></div></div>';if(!m.e)need.push(m.id)});
+setTimeout(function(){fillEx(need)},0);return h}
 /* ---------- bookmarks, wrong, revision ---------- */
 function bmpage(){var l=D.bm.map(mcqById).filter(Boolean).sort(function(a,b){return path(a.sec)<path(b.sec)?-1:1});
-return '<div class="row"><h2 class="t sp">Bookmarks</h2>'+(l.length?'<button class="btn" onclick="start(\'bm\')">Practice</button>':"")+'</div>'+(l.length?l.map(function(m){return '<div class="box" style="--c:#f59e0b"><span class="pill" style="--c:#f59e0b">'+esc(path(m.sec))+'</span><p style="color:inherit;margin:8px 0"><b>'+esc(m.q)+'</b></p><div class="mu">Answer: '+"ABCDE"[m.a]+'. '+esc(m.o[m.a])+'</div>'+(m.e?'<div class="mu">'+esc(m.e)+'</div>':"")+'<button class="btn g s" style="margin-top:8px" onclick="bmk(\''+m.id+'\')">Remove</button></div>'}).join(""):box("#f59e0b","🔖","No bookmarks yet","Tap Bookmark while practising to save a question here.","",0,0))}
+return '<div class="row"><h2 class="t sp">Bookmarks</h2>'+(l.length?'<button class="btn" onclick="start(\'bm\')">Practice</button>':"")+'</div>'+(l.length?l.map(function(m){return '<div class="box" style="--c:#f59e0b"><span class="pill" style="--c:#f59e0b">'+esc(path(m.sec))+'</span><p style="color:inherit;margin:8px 0"><b>'+qnum(m)+esc(m.q)+'</b></p>'+qimg(m)+'<div class="mu">Answer: '+"ABCDE"[m.a]+'. '+esc(m.o[m.a])+'</div>'+(m.e?'<div class="mu">'+esc(m.e)+'</div>':"")+'<button class="btn g s" style="margin-top:8px" onclick="bmk(\''+m.id+'\')">Remove</button></div>'}).join(""):box("#f59e0b","🔖","No bookmarks yet","Tap Bookmark while practising to save a question here.","",0,0))}
 function wrong(){var l=D.mcq.filter(function(m){return isWrong(m.id)}).sort(function(a,b){return wc(b.id)-wc(a.id)}),rp=l.filter(function(m){return wc(m.id)>=2}).length;
 return '<div class="row"><h2 class="t sp">Wrong Questions</h2>'+(l.length?'<button class="btn" onclick="start(\'wrong\')">Practice</button>':"")+'</div><div class="card mu">'+l.length+' to fix · '+rp+' repeated mistakes · '+D.mast.length+' mastered</div>'+
-(l.length?l.map(function(m){return '<div class="box" style="--c:#e11d48"><span class="pill" style="--c:#e11d48">Wrong '+wc(m.id)+'x</span> <span class="mu">'+esc(path(m.sec))+'</span><p style="color:inherit;margin:8px 0"><b>'+esc(m.q)+'</b></p><div class="mu">Answer: '+"ABCDE"[m.a]+'. '+esc(m.o[m.a])+'</div>'+(m.e?'<div class="mu">'+esc(m.e)+'</div>':"")+'<button class="btn g s" style="margin-top:8px" onclick="D.mast.push(\''+m.id+'\');save();render()">Mark mastered</button></div>'}).join(""):box("#e11d48","🎉","Nothing to fix","Wrong answers are saved here automatically.","",0,0))+(D.mast.length?'<button class="btn g s" onclick="D.mast=[];save();render()">Reset mastered</button>':"")}
+(l.length?l.map(function(m){return '<div class="box" style="--c:#e11d48"><span class="pill" style="--c:#e11d48">Wrong '+wc(m.id)+'x</span> <span class="mu">'+esc(path(m.sec))+'</span><p style="color:inherit;margin:8px 0"><b>'+qnum(m)+esc(m.q)+'</b></p>'+qimg(m)+'<div class="mu">Answer: '+"ABCDE"[m.a]+'. '+esc(m.o[m.a])+'</div>'+(m.e?'<div class="mu">'+esc(m.e)+'</div>':"")+'<button class="btn g s" style="margin-top:8px" onclick="D.mast.push(\''+m.id+'\');save();render()">Mark mastered</button></div>'}).join(""):box("#e11d48","🎉","Nothing to fix","Wrong answers are saved here automatically.","",0,0))+(D.mast.length?'<button class="btn g s" onclick="D.mast=[];save();render()">Reset mastered</button>':"")}
 function revision(){var rv=D.mcq.filter(function(m){return isWrong(m.id)||D.bm.indexOf(m.id)>-1}).length,wk=D.sec.map(function(x){return{s:x,x:stat(x.id)}}).filter(function(o){return o.x.n>=3&&o.x.p<70}).sort(function(a,b){return a.x.p-b.x.p});
 var h='<h2 class="t">Revision</h2><div class="hero"><h2>Revise Today</h2><p>'+rv+' MCQs: wrong answers and bookmarks</p><button class="btn w" onclick="start(\'rev\')">Start revision</button></div><div class="g2">'+box("#e11d48","❌","Wrong MCQs","Previous mistakes","","go('wrong')",1)+box("#f59e0b","🔖","Bookmarked","Saved questions",D.bm.length+" SAVED","go('bmpage')",1)+'</div><h3 style="margin-top:16px">Weak sections</h3>';
 return h+(wk.length?wk.map(function(o){return '<div class="box" style="--c:'+o.s.c+'"><div class="row"><span class="sp"><b>'+o.s.em+' '+esc(path(o.s.id))+'</b></span><span class="pill">'+o.x.p+'%</span></div><button class="btn g s" style="margin-top:8px" onclick="start(\'s:'+o.s.id+'\')">Revise</button></div>'}).join(""):'<div class="card mu">Sections under 70% accuracy (3+ attempts) show up here.</div>')}
@@ -352,15 +451,49 @@ function getChunks(sel){var key=sel||"all";if(CC[key])return Promise.resolve(CC[
 return Promise.all(idl.map(function(id){return sget("b",id).then(function(o){var bk=D.books.filter(function(x){return x.id===id})[0],c=[];if(o&&bk)o.pages.forEach(function(pg,pi){for(var i=0;i<pg.length;i+=1400)c.push({t:bk.t,p:pi+1,tx:pg.slice(i,i+1500)})});return c})})).then(function(a){var c=[].concat.apply([],a);CC[key]=c;return c})}
 function bookPages(buf){return pdfLib().then(function(L){return L.getDocument({data:new Uint8Array(buf)}).promise}).then(function(doc){var out=[],n=doc.numPages;
 function pg(i){if(i>n)return out;var e=$("bkb");if(e)e.textContent="Reading page "+i+" of "+n+"...";return doc.getPage(i).then(function(p){return p.getTextContent()}).then(function(tc){var t="",y=null;tc.items.forEach(function(it){var ty=it.transform[5];if(y!==null)t+=Math.abs(ty-y)>3?"\n":" ";t+=it.str;y=ty});out.push(t);return pg(i+1)})}return pg(1)})}
-function books(){var h='<h2 class="t">My Books</h2><div class="box" style="--c:#7c3aed"><p>Add your books. The AI Assistant reads them and answers from them. Books stay on this device.</p><input id="bkt" placeholder="Book title, for example Biology Part 1"><div class="mu" style="margin-bottom:6px">PDF file</div><input id="bkf" type="file" accept="application/pdf"><textarea id="bkx" placeholder="Or paste book text here"></textarea><button class="btn" onclick="addBook()">Add book</button><div class="mu" id="bkb" style="margin-top:8px"></div></div>';
-D.books.forEach(function(b){h+='<div class="box" style="--c:#7c3aed"><div class="em">📚</div><h3>'+esc(b.t)+'</h3><p>'+b.n+' pages · '+Math.round(b.c/1000)+'k characters</p><button class="btn g s" onclick="delBook(\''+b.id+'\')">Delete</button></div>'});
-return h}
-function addBook(){var t=$("bkt").value.trim(),f=$("bkf").files[0],x=$("bkx").value.trim(),e=$("bkb");if(!t||(!f&&!x)){alert("Add a title and a PDF or some text.");return}
-var fin=function(pages){pages=pages.filter(function(p){return p.trim().length>20});if(!pages.length){alert("No text found. Scanned PDFs can't be read. Use a text PDF or paste the text.");if(e)e.textContent="";return}
-var id=uid();sput("b",id,{pages:pages}).then(function(){D.books.push({id:id,t:t,n:pages.length,c:pages.join("").length});CC={};save();render()},function(){alert("Not enough storage for this book.")})};
-if(e)e.textContent="Reading...";
-if(f)f.arrayBuffer().then(function(b){bookPages(b).then(fin,function(er){if(e)e.textContent="";alert(er==="nolib"?"The PDF reader could not start in this browser. Use the latest Chrome.":"Could not read this PDF.")})});
-else{var ps=[];for(var i=0;i<x.length;i+=1800)ps.push(x.slice(i,i+1800));fin(ps)}}
+var BI=null,STOPW={};"a an the of to in on at by for with from and or but if then than that this these those is are was were be been being it its as which who whom whose what when where why how do does did has have had not no can could may might will would shall should into onto over under between among also such other any each both all some most more less very".split(" ").forEach(function(w){STOPW[w]=1});
+function stem(w){if(/^\d/.test(w))return w;if(w.length>5&&/ing$/.test(w))w=w.slice(0,-3);else if(w.length>4&&/ies$/.test(w))w=w.slice(0,-3)+"y";else if(w.length>4&&/(ed|es)$/.test(w))w=w.slice(0,-2);else if(w.length>3&&/s$/.test(w)&&!/ss$/.test(w))w=w.slice(0,-1);if(w.length>4&&/e$/.test(w))w=w.slice(0,-1);return w}
+function tok(s){var a=(String(s).toLowerCase().match(/[a-z0-9]+(?:\.[0-9]+)?/g)||[]),o=[],u={};a.forEach(function(w){w=stem(w);if((w.length>1||/\d/.test(w))&&!STOPW[w]&&!u[w]){u[w]=1;o.push(w)}});return o}
+function paras(t){var L=String(t).replace(/-\n(?=[a-z])/g,"").split("\n"),out=[],cur="";L.forEach(function(l){l=l.replace(/\s+/g," ").trim();if(!l){if(cur){out.push(cur);cur=""}return}
+if(cur&&/[.!?:;]$/.test(cur)){out.push(cur);cur=l}else cur=cur?cur+" "+l:l});if(cur)out.push(cur);return out}
+function sents(p){return(p.match(/[^.!?]+(?:[.!?]+(?=\s|$)|$)/g)||[p]).map(function(x){return x.trim()}).filter(function(x){return x.length>8})}
+function buildIdx(){if(BI)return Promise.resolve(BI);
+return Promise.all(D.books.map(function(b){return sget("b",b.id).then(function(o){return{b:b,pages:o&&o.pages?o.pages:[]}})})).then(function(arr){var segs=[],post={};
+arr.forEach(function(it){it.pages.forEach(function(pt,pi){paras(pt).forEach(function(par){var ss=sents(par);for(var i=0;i<ss.length;i++){var cand=[ss[i]];if(ss[i+1])cand.push(ss[i]+" "+ss[i+1]);cand.forEach(function(tx){if(tx.length>700)tx=tx.slice(0,700);var tk=tok(tx);if(tk.length<3)return;var id=segs.length;segs.push({t:it.b.t,p:pi+1,tx:tx});tk.forEach(function(w){(post[w]=post[w]||[]).push(id)})})}})})});
+BI={segs:segs,post:post,N:segs.length};return BI})}
+function bookAnswer(m){var B=BI,N=Math.max(B.N,1);
+if(/\b(not|except|incorrect|false|least|never|exception|wrong)\b/i.test(m.q))return{skip:1};
+if(m.o.some(function(o){return/(all|none|both|neither)\s+(of\s+)?(the\s+)?(above|these|them)|^both\b|^neither\b|\ball\b.*\babove\b/i.test(o)}))return{skip:1};
+var qt=tok(m.q),ot=m.o.map(tok);if(!qt.length||ot.some(function(a){return!a.length}))return null;
+var ct={};ot.forEach(function(a){a.forEach(function(w){ct[w]=(ct[w]||0)+1})});
+var dt=ot.map(function(a){var d=a.filter(function(w){return ct[w]<2});return d.length?d:a});
+function idf(w){var p=B.post[w];return p?Math.log(1+N/p.length):Math.log(1+N)}
+function acc(tk){var a={},W=0;tk.forEach(function(w){var p=B.post[w],f=idf(w);W+=f;if(p&&p.length<Math.max(N*0.25,60))for(var i=0;i<p.length;i++)a[p[i]]=(a[p[i]]||0)+f});return{a:a,W:W}}
+var Q=acc(qt),O=dt.map(acc),C={};
+function top(a,k){return Object.keys(a).sort(function(x,y){return a[y]-a[x]}).slice(0,k)}
+top(Q.a,40).forEach(function(i){C[i]=1});O.forEach(function(o){top(o.a,12).forEach(function(i){C[i]=1})});
+var best=m.o.map(function(){return{sc:0}});
+Object.keys(C).forEach(function(id){var qc=(Q.a[id]||0)/Q.W;if(qc<0.2)return;var ocs=O.map(function(o){return(o.a[id]||0)/o.W});ocs.forEach(function(oc,i){var mo=0;ocs.forEach(function(x,j){if(j!==i&&x>mo)mo=x});var sc=0.4*qc+0.6*oc-0.3*mo;if(sc>best[i].sc)best[i]={sc:sc,oc:oc,qc:qc,id:id}})});
+var ord=best.map(function(b,i){return{i:i,b:b}}).sort(function(x,y){return y.b.sc-x.b.sc}),b=ord[0].b,s2=ord[1]?ord[1].b.sc:0,mg=b.sc-s2;
+if(!(b.sc>=0.5&&mg>=0.1&&b.oc>=0.5&&b.qc>=0.3))return null;
+var sg=B.segs[b.id];return{a:ord[0].i,c:(b.sc>=0.7&&mg>=0.2&&b.oc>=0.8)?"h":"m",t:sg.t,p:sg.p,tx:sg.tx}}
+function bookKey(id){var a=id?ids(id):null,list=D.mcq.filter(function(m){return m.a<0&&(!a||a.indexOf(m.sec)>-1)});
+if(!list.length){alert("No MCQs without an answer.");return}if(!D.books.length){alert("Add your books first in My Books.");go("books");return}
+SOLV={list:list,i:0,ok:0,hi:0,miss:0,sk:0,id:id,stop:0,mode:"book"};go("solve");setTimeout(bookStep,60)}
+function bookStep(){var s=SOLV;if(!s||s.mode!=="book")return;
+var up=function(){var e=$("svt");if(e)e.textContent=(s.i>=s.list.length||s.stop)?"Done":"Question "+(s.i+1)+" of "+s.list.length;e=$("svb");if(e)e.style.width=Math.round(s.i/s.list.length*100)+"%";e=$("svs");if(e)e.textContent=s.ok+" answered from your books ("+s.hi+" high confidence) · "+s.sk+" skipped (NOT / All of the above) · "+s.miss+" not found in books"};
+var e0=$("svt");if(e0)e0.textContent="Reading your books...";
+setTimeout(function(){buildIdx().then(function(){
+function loop(){var t0=Date.now();while(s.i<s.list.length&&!s.stop&&Date.now()-t0<14){var m=s.list[s.i],r=null;try{r=bookAnswer(m)}catch(x){r=null}
+if(r&&r.skip)s.sk++;else if(r){m.a=r.a;m.ks={b:r.t,p:r.p,c:r.c};if(!m.e)m.e="From your book "+r.t+", page "+r.p+": "+r.tx.slice(0,260);s.ok++;if(r.c==="h")s.hi++}else s.miss++;s.i++}
+up();if(s.i<s.list.length&&!s.stop)setTimeout(loop,0);else save()}
+loop()},function(){var e=$("svs");if(e)e.textContent="Could not read your books."})},40)}
+var BR=[];
+function bookSearch(){var q=$("bsq").value.trim(),r=$("bsr");if(!q)return;if(!D.books.length){alert("Add a book first.");return}r.innerHTML='<div class="mu">Searching your books...</div>';
+setTimeout(function(){buildIdx().then(function(B){var qt=tok(q),a={};qt.forEach(function(w){var p=B.post[w];if(!p)return;var f=Math.log(1+B.N/p.length);for(var i=0;i<p.length;i++)a[p[i]]=(a[p[i]]||0)+f});
+var o=Object.keys(a).sort(function(x,y){return a[y]-a[x]}),seen={};BR=[];for(var k=0;k<o.length&&BR.length<8;k++){var sg=B.segs[o[k]],key=sg.t+"|"+sg.p;if(seen[key])continue;seen[key]=1;BR.push(sg)}
+r.innerHTML=BR.length?BR.map(function(sg,i){return'<div class="box" style="--c:#7c3aed"><span class="pill">'+esc(sg.t)+' · p.'+sg.p+'</span><p style="color:inherit;margin:8px 0">'+esc(sg.tx)+'</p><button class="btn g s" onclick="saveBk('+i+')">Save to notes</button></div>'}).join(""):'<div class="mu">Nothing found in your books.</div>'})},40)}
+function saveBk(i){var sg=BR[i];if(!sg)return;D.notes.push({id:uid(),title:sg.t+" p."+sg.p,body:sg.tx,s:$("bss").value,t:Date.now()});save();alert("Saved to Notes.")}
 function delBook(id){if(!confirm("Delete this book?"))return;D.books=D.books.filter(function(b){return b.id!==id});sdel("b",id);CC={};save();render()}
 function callAI(p,on){if(!window.claude||!claude.use)return Promise.reject("noai");return claude.use("sample").then(function(sm){if(!sm)throw"noai";return sm(p,{cache:false,onText:on})}).then(function(o){return o&&o.text||""})}
 function ai(){return '<h2 class="t">AI Assistant</h2><div class="box" style="--c:#7c3aed"><p>Ask a question or paste an MCQ. The AI searches your books and answers from them. Needs internet.</p><div class="mu">Source</div><select id="as"><option value="all">All my books ('+D.books.length+')</option>'+D.books.map(function(b){return '<option value="'+b.id+'">'+esc(b.t)+'</option>'}).join("")+'<option value="none">No books (notes only)</option></select><div class="mu">Note (optional)</div><select id="an"><option value="">None</option>'+D.notes.map(function(n){return '<option value="'+n.id+'">'+esc(n.title)+'</option>'}).join("")+'</select><textarea id="aq" style="min-height:90px" placeholder="Ask a question, or paste an MCQ with its options"></textarea><label class="mu" style="display:flex;gap:8px;align-items:center;margin-bottom:8px"><input type="checkbox" id="ao" style="width:auto;margin:0"'+(D.set.only?" checked":"")+'> Answer only from my books and notes</label><button class="btn" onclick="askAI()">Ask</button></div>'+(D.books.length?"":box("#7c3aed","📚","Add your books first","Open My Books and add a PDF.","","go('books')",1))+'<div class="card" id="ar" style="white-space:pre-wrap">The answer appears here.</div>'}
@@ -372,7 +505,85 @@ var p="You are an MDCAT tutor. "+(ex||nt?"Study material:\n"+ex+nt:"No study mat
 r.textContent="Thinking...";return callAI(p,function(o){r.textContent=o.text}).then(function(t){if(t)r.textContent=t})}).catch(function(e){r.textContent=e==="noai"?"AI is not available in this view. Open the app from your claude.ai account.":"Could not get an answer."})}
 var SOLV=null;
 function solveSec(id){var a=ids(id),list=D.mcq.filter(function(m){return a.indexOf(m.sec)>-1&&m.a<0});if(!list.length)return;if(!D.books.length){alert("Add your books first in My Books.");return}SOLV={list:list,i:0,ok:0,miss:0,id:id,stop:0};go("solve");solveStep()}
-function solve(){var s=SOLV;if(!s)return practice();return '<h2 class="t">AI answer key</h2><div class="box" style="--c:#7c3aed"><b id="svt">Starting...</b><div class="bar"><i id="svb" style="width:0%;background:#7c3aed"></i></div><div class="mu" id="svs"></div><div class="row" style="margin-top:10px"><button class="btn g" onclick="SOLV.stop=1">Stop</button><button class="btn" onclick="'+gp(s.id)+'">Back</button></div></div>'}
+function chainSec(id){var a=[],x=secById(id);while(x){a.push(x.id);x=x.p?secById(x.p):null}return a}
+function allowFor(sec){var ch=chainSec(sec),a={},n=0;D.books.forEach(function(b){if(!b.sec||ch.indexOf(b.sec)>-1){a[b.id]=1;if(b.sec)n++}});return n?a:null}
+function bookEvidence(m,allow){var B=BI;if(!B||!B.N)return null;var N=B.N,qt=tok(m.q),ct=tok(m.o[m.a]||"");if(!qt.length)return null;
+function idf(w){var p=B.post[w];return p?Math.log(1+N/p.length):Math.log(1+N)}
+function acc(tk){var a={},W=0;tk.forEach(function(w){var p=B.post[w],f=idf(w);W+=f;if(p&&p.length<Math.max(N*0.25,60))for(var i=0;i<p.length;i++){if(allow&&!allow[B.segs[p[i]].bk])continue;a[p[i]]=(a[p[i]]||0)+f}});return{a:a,W:W}}
+var Q=acc(qt),C=ct.length?acc(ct):null,cand={},best=null,bs=0;function top(a,k){return Object.keys(a).sort(function(x,y){return a[y]-a[x]}).slice(0,k)}
+top(Q.a,50).forEach(function(i){cand[i]=1});if(C)top(C.a,30).forEach(function(i){cand[i]=1});
+Object.keys(cand).forEach(function(id){var qc=(Q.a[id]||0)/Q.W,cc=C?(C.a[id]||0)/C.W:0.5,sc=0.4*qc+0.6*cc;if(qc>=0.25&&cc>=0.5&&sc>bs){bs=sc;best=id}});
+return bs>=0.45?B.segs[best]:null}
+function fillEx(list){var need=list.map(mcqById).filter(function(m){return m&&!m.e});if(!need.length||!D.books.length)return;
+setTimeout(function(){buildIdx().then(function(){var ch=0;need.forEach(function(m){var sg=null;try{sg=bookEvidence(m,allowFor(m.sec))}catch(e){}var el=document.querySelector('[data-ex="'+m.id+'"]');if(sg){m.e="From your book "+sg.t+", page "+sg.p+": "+sg.tx.slice(0,300);ch++;if(el)el.textContent=m.e}else if(el)el.textContent="No explanation found in your books for this MCQ."});if(ch)save()})},60)}
+var TES=null;
+function loadTes(){if(window.Tesseract)return Promise.resolve(window.Tesseract);if(TES)return TES;TES=new Promise(function(res,rej){var s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";s.onload=function(){window.Tesseract?res(window.Tesseract):(TES=null,rej("noocr"))};s.onerror=function(){TES=null;rej("noocr")};document.head.appendChild(s)});return TES}
+function ocrImg(src,prog){return loadTes().then(function(T){return T.recognize(src,"eng",{logger:function(m){if(prog&&m.status==="recognizing text")prog(m.progress)}})}).then(function(r){return r&&r.data&&r.data.text||""})}
+function imgCanvas(file,max){return new Promise(function(res,rej){var u=URL.createObjectURL(file),im=new Image();im.onload=function(){var r=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*r);c.height=Math.round(im.height*r);var x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);res(c)};im.onerror=function(){URL.revokeObjectURL(u);rej("badimg")};im.src=u})}
+function ocrImages(fs,prog){var out=[];function one(i){if(i>=fs.length)return out;return imgCanvas(fs[i],1800).then(function(c){return ocrImg(c,function(f){if(prog)prog(i+1,fs.length,f)}).then(function(t){out.push(t);c.width=0;return one(i+1)})})}return loadTes().then(function(){return one(0)})}
+function ocrPdf(buf,prog){return loadTes().then(function(){return pdfLib()}).then(function(L){return L.getDocument({data:new Uint8Array(buf)}).promise}).then(function(doc){var out=[],n=doc.numPages;
+function pg(i){if(i>n)return out;return doc.getPage(i).then(function(p){var vp=p.getViewport({scale:2}),c=document.createElement("canvas");c.width=Math.ceil(vp.width);c.height=Math.ceil(vp.height);var x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);
+return p.render({canvasContext:x,viewport:vp}).promise.then(function(){return ocrImg(c,function(f){if(prog)prog(i,n,f)})}).then(function(t){out.push(t);c.width=0;return pg(i+1)})})}return pg(1)})}
+function keepForever(){try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().then(function(g){window._persist=g})}catch(e){}}
+keepForever();
+function bkSel(id){window._bsec=id;Q=id;render();window.scrollTo(0,0)}
+function libNode(id,d){var x=secById(id);if(!x)return"";var bk=D.books.filter(function(b){return b.sec===id}),ch=kids(id),
+h='<div class="box" style="--c:'+x.c+';margin-left:'+Math.min(d,3)*10+'px"><div class="row"><b class="sp">'+x.em+' '+esc(x.name)+'</b><button class="btn g s" onclick="bkSel(\''+id+'\')">Upload here</button></div>';
+bk.forEach(function(b){h+='<div class="mu" style="margin-top:6px">📚 '+esc(b.t)+' · '+b.n+' pages · saved <a onclick="delBook(\''+b.id+'\')" style="color:#e11d48;cursor:pointer">Delete</a></div>'});
+if(!bk.length&&!ch.length)h+='<div class="mu" style="margin-top:6px">No book uploaded yet</div>';h+='</div>';ch.forEach(function(k){h+=libNode(k.id,d+1)});return h}
+function addChap(){var p=$("chp").value||null,n=$("chn").value.trim();if(!n){alert("Type the chapter or section name.");return}var x=p?secById(p):null,id=uid();D.sec.push({id:id,name:n,em:"📖",c:x?x.c:"#7c3aed",p:p});window._bsec=id;Q=id;save();render()}
+function bkBackup(){Promise.all(D.books.map(function(b){return sget("b",b.id).then(function(o){return{m:b,pages:o&&o.pages?o.pages:[]}})})).then(function(arr){var blob=new Blob([JSON.stringify({v:1,secs:D.sec,books:arr})],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="mdcat-books-backup.json";document.body.appendChild(a);a.click();setTimeout(function(){a.remove();URL.revokeObjectURL(a.href)},800)})}
+function bkRestore(el){var f=el.files&&el.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){try{var o=JSON.parse(rd.result),n=0,jobs=[];(o.secs||[]).forEach(function(x){if(!secById(x.id))D.sec.push(x)});
+(o.books||[]).forEach(function(it){if(!it||!it.m||D.books.some(function(b){return b.id===it.m.id}))return;jobs.push(sput("b",it.m.id,{pages:it.pages||[]}).then(function(){D.books.push(it.m);n++}))});
+Promise.all(jobs).then(function(){BI=null;CC={};save();alert(n+" book"+(n===1?"":"s")+" restored.");render()})}catch(e){alert("This is not a valid books backup file.")}};rd.readAsText(f)}
+function books(){var un=D.mcq.filter(function(m){return m.a<0}).length,sel=Q||window._bsec||"",opts=D.sec.map(function(x){return'<option value="'+x.id+'"'+(x.id===sel?" selected":"")+'>'+esc(path(x.id))+'</option>'}).join("");
+var h='<h2 class="t">My Books</h2><div class="box" style="--c:#0d9f6e"><b>🔒 Saved on this device for good</b><p style="margin:6px 0 0">Every book you upload is read page by page and its text is saved inside the app. It stays after you close the app or restart your phone. '+D.books.length+' book'+(D.books.length===1?"":"s")+' saved. Use Backup at the bottom to keep a copy of your books in a file.</p></div><div style="height:12px"></div>';
+h+='<div class="box" style="--c:#7c3aed"><b>Upload a book or chapter</b><p style="margin:6px 0 10px">1. Pick the section (for example First Year (XI) › Biology › your chapter). 2. Upload the PDF or photos of the pages. The app reads the book and uses it for that section.</p><div class="mu" style="margin-bottom:6px">Section</div><select id="bks" onchange="window._bsec=this.value"><option value="">No section (use for everything)</option>'+opts+'</select><input id="bkt" placeholder="Book or chapter title (optional)"><div class="mu" style="margin-bottom:6px">PDF file(s) or photos of the pages</div><input id="bkf" type="file" accept="application/pdf,image/*" multiple><textarea id="bkx" placeholder="Or paste text here (needs a title)"></textarea><button class="btn" onclick="addBook()">Upload and read</button><div class="mu" id="bkb" style="margin-top:8px"></div><p class="mu" style="margin:8px 0 0">Photos and scanned PDFs are read with OCR, which needs internet. Choose photos in page order.</p></div><div style="height:12px"></div>';
+h+='<div class="box" style="--c:#f59e0b"><b>➕ Add a new chapter or section</b><div class="mu" style="margin:6px 0">Put it inside</div><select id="chp"><option value="">(top level)</option>'+opts+'</select><input id="chn" placeholder="Name, for example Chapter 3: Enzymes"><button class="btn" onclick="addChap()">Add</button></div><div style="height:12px"></div>';
+if(D.books.length&&un)h+='<div class="box tap" style="--c:#0d9f6e" onclick="bookKey(null)"><span class="go">→</span><div class="em">🔑</div><h3>Find answers from my books</h3><p>'+un+' MCQs have no answer. The app searches the book of each MCQ\'s section and fills the key, with the book page as the explanation.</p><span class="pill">OFFLINE</span></div><div style="height:12px"></div>';
+h+='<h3>Chapterwise library</h3>';var shown={};["xi","xii"].forEach(function(r){if(secById(r)){h+=libNode(r,0);ids(r).forEach(function(i){shown[i]=1})}});
+D.sec.filter(function(x){return!x.p&&!shown[x.id]&&ids(x.id).some(function(i){return D.books.some(function(b){return b.sec===i})})}).forEach(function(x){h+=libNode(x.id,0);ids(x.id).forEach(function(i){shown[i]=1})});
+var loose=D.books.filter(function(b){return!b.sec||!secById(b.sec)});if(loose.length){h+='<div class="box" style="--c:#6e6a80"><b>Not in a section (used for everything)</b>';loose.forEach(function(b){h+='<div class="mu" style="margin-top:6px">📚 '+esc(b.t)+' · '+b.n+' pages <a onclick="delBook(\''+b.id+'\')" style="color:#e11d48;cursor:pointer">Delete</a></div>'});h+='</div>'}
+if(D.books.length)h+='<div style="height:12px"></div><div class="box" style="--c:#06b6d4"><b>Search inside my books</b><div style="height:8px"></div><input id="bsq" placeholder="Type a topic or question"><select id="bss">'+SUBJ.map(function(s){return'<option>'+s+'</option>'}).join("")+'</select><div class="mu" style="margin:-2px 0 8px">Subject used when you save a result to Notes</div><button class="btn" onclick="bookSearch()">Search</button></div><div id="bsr"></div>';
+h+='<div style="height:12px"></div><div class="box" style="--c:#2563eb"><b>Backup my books</b><p style="margin:6px 0 10px">Saves all your books and chapters into one file you can keep or move to another phone.</p><div class="row"><button class="btn g" onclick="bkBackup()">Download backup</button></div><div class="mu" style="margin:10px 0 6px">Restore from a backup file</div><input type="file" accept="application/json,.json" onchange="bkRestore(this)"></div>';
+return h}
+function addBook(){var t=$("bkt").value.trim(),sec=$("bks").value||undefined,fl=Array.prototype.slice.call($("bkf").files||[]),x=$("bkx").value.trim(),e=$("bkb");
+var pdfs=fl.filter(function(f){return/pdf$/i.test(f.type)||/\.pdf$/i.test(f.name)}),imgs=fl.filter(function(f){return/^image\//.test(f.type)});
+if(!pdfs.length&&!imgs.length&&(!x||!t)){alert("Choose a PDF or photos, or paste text with a title.");return}
+var jobs=[],fail=[],added=0;pdfs.forEach(function(f){jobs.push({t:(fl.length===1&&t)?t:f.name.replace(/\.pdf$/i,""),f:f})});
+if(imgs.length)jobs.push({t:t||"Chapter photos",imgs:imgs});if(!pdfs.length&&!imgs.length)jobs.push({t:t,x:x});
+function say(m){if(e)e.textContent=m}
+function done(){BI=null;CC={};save();say("");render();alert(added?added+" book"+(added>1?"s":"")+" saved"+(fail.length?". Could not add: "+fail.join(", "):"."):"Could not add: "+fail.join(", "))}
+function why(er){return er==="noocr"?" (OCR could not load - check your internet)":er==="badimg"?" (a photo could not be opened)":""}
+function store(j,pages,k){pages=pages.filter(function(p){return p.trim().length>20});if(!pages.length){fail.push(j.t+" (no text found)");return one(k+1)}var id=uid();
+return sput("b",id,{pages:pages}).then(function(){D.books.push({id:id,t:j.t,n:pages.length,c:pages.join("").length,sec:sec});added++;one(k+1)},function(){fail.push(j.t+" (not enough storage)");one(k+1)})}
+function one(k){if(k>=jobs.length)return done();var j=jobs[k],lab=jobs.length>1?"("+(k+1)+"/"+jobs.length+") ":"";
+if(j.f){say(lab+"Reading "+j.t+"...");return j.f.arrayBuffer().then(function(buf){return bookPages(buf).then(function(pages){var good=pages.filter(function(p){return p.trim().length>20}).length;
+if(good>=pages.length*0.3)return store(j,pages,k);
+if(!confirm(j.t+" looks scanned (no selectable text). Read it with OCR? It needs internet and can take a few minutes."))return store(j,pages,k);
+return ocrPdf(buf,function(i,n,f){say(lab+"OCR page "+i+" of "+n+" · "+Math.round(f*100)+"%")}).then(function(p2){return store(j,p2,k)},function(er){fail.push(j.t+why(er));one(k+1)})})}).then(null,function(){fail.push(j.t+" (could not read this PDF)");one(k+1)})}
+if(j.imgs){say(lab+"Loading the reader...");return ocrImages(j.imgs,function(i,n,f){say(lab+"Reading photo "+i+" of "+n+" · "+Math.round(f*100)+"%")}).then(function(p){return store(j,p,k)},function(er){fail.push(j.t+why(er));one(k+1)})}
+var ps=[];for(var i=0;i<j.x.length;i+=1800)ps.push(j.x.slice(i,i+1800));return store(j,ps,k)}
+one(0)}
+function verifyKey(id){var a=ids(id),list=D.mcq.filter(function(m){return a.indexOf(m.sec)>-1&&m.a>=0&&!m.vf});
+if(!D.books.length){alert("Add this section's book first.");go("books",id);return}if(!list.length){alert("Nothing new to verify here.");return}
+SOLV={list:list,i:0,ok:0,cf:0,miss:0,sk:0,id:id,stop:0,mode:"verify"};go("solve");setTimeout(verifyStep,60)}
+function verifyStep(){var s=SOLV;if(!s||s.mode!=="verify"||s.view)return;
+var up=function(){var e=$("svt");if(e)e.textContent=(s.i>=s.list.length||s.stop)?"Done":"Checking "+(s.i+1)+" of "+s.list.length;e=$("svb");if(e)e.style.width=Math.round(s.i/s.list.length*100)+"%";e=$("svs");if(e)e.textContent=s.ok+" match your book · "+s.cf+" differ · "+s.miss+" could not be checked · "+s.sk+" skipped"};
+var e0=$("svt");if(e0)e0.textContent="Reading your books...";
+setTimeout(function(){buildIdx().then(function(){function loop(){var t0=Date.now();
+while(s.i<s.list.length&&!s.stop&&Date.now()-t0<14){var m=s.list[s.i],r=null;try{r=bookAnswer(m,allowFor(m.sec))}catch(x){r=null}
+if(r&&r.skip)s.sk++;else if(!r)s.miss++;else if(r.a===m.a){m.vf={ok:1,b:r.t,p:r.p};s.ok++}else{m.vf={ok:0,a:r.a,b:r.t,p:r.p,c:r.c,tx:r.tx.slice(0,260)};s.cf++}s.i++}
+up();if(s.i<s.list.length&&!s.stop)setTimeout(loop,0);else{save();refreshConf()}}loop()})},40)}
+function confHtml(id){var a=ids(id),l=D.mcq.filter(function(m){return a.indexOf(m.sec)>-1&&m.vf&&m.vf.ok===0&&!m.vf.keep});if(!l.length)return"";
+return'<h3>Answers that differ from your book</h3>'+l.map(function(m){return'<div class="box" style="--c:#f59e0b"><b>'+esc(m.q)+'</b>'+qimg(m)+'<div class="mu" style="margin-top:6px">Your key: '+"ABCDE"[m.a]+'. '+esc(m.o[m.a])+'</div><div class="mu">Book says: '+"ABCDE"[m.vf.a]+'. '+esc(m.o[m.vf.a])+' ('+esc(m.vf.b)+', p.'+m.vf.p+')</div><div class="mu" style="margin-top:4px">'+esc(m.vf.tx||"")+'</div><div class="row" style="margin-top:8px"><button class="btn s" onclick="useBk(\''+m.id+'\')">Use book answer</button><button class="btn g s" onclick="keepMine(\''+m.id+'\')">Keep mine</button></div></div>'}).join("")}
+function refreshConf(){var e=$("svl");if(e&&SOLV)e.innerHTML=confHtml(SOLV.id)}
+function useBk(id){var m=mcqById(id);if(!m||!m.vf)return;m.a=m.vf.a;m.ks={b:m.vf.b,p:m.vf.p,c:m.vf.c||"m"};m.vf={ok:1,b:m.vf.b,p:m.vf.p};save();refreshConf()}
+function keepMine(id){var m=mcqById(id);if(!m||!m.vf)return;m.vf.keep=1;save();refreshConf()}
+function verifyShow(id){SOLV={list:[],i:0,ok:0,cf:0,miss:0,sk:0,id:id,stop:0,mode:"verify",view:1};go("solve")}
+function solve(){var s=SOLV;if(!s)return practice();var t=s.mode==="book"?"Book answer key":s.mode==="verify"?"Verify with book":"AI answer key";
+return'<h2 class="t">'+t+'</h2><div class="box" style="--c:#7c3aed"><b id="svt">'+(s.view?"Review":"Starting...")+'</b><div class="bar"><i id="svb" style="width:0%;background:#7c3aed"></i></div><div class="mu" id="svs"></div><div class="row" style="margin-top:10px"><button class="btn g" onclick="SOLV.stop=1">Stop</button><button class="btn" onclick="'+gp(s.id)+'">Back</button></div></div><div id="svl">'+(s.mode==="verify"?confHtml(s.id):"")+'</div>'}
+
 function solveStep(){var s=SOLV;if(!s)return;var up=function(){var e=$("svt");if(e)e.textContent=(s.i>=s.list.length||s.stop)?"Done":"Question "+(s.i+1)+" of "+s.list.length;e=$("svb");if(e)e.style.width=Math.round(s.i/s.list.length*100)+"%";e=$("svs");if(e)e.textContent=s.ok+" answered from your books · "+s.miss+" not found"};up();
 if(s.stop||s.i>=s.list.length){save();return}
 var m=s.list[s.i],q=m.q+" "+m.o.join(" ");
